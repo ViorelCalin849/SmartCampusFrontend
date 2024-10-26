@@ -1,0 +1,121 @@
+/* src/Login.css */
+
+body, html {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Ensure it occupies the full viewport height */
+    background-image: url('../../public/loginBackground.jpg');
+    background-size: cover; /* Make the background image cover the whole page */
+    background-position: center; /* Center the image */
+    background-repeat: no-repeat; /* Prevent image from repeating */
+    background-attachment: fixed; /* Keep the image fixed when scrolling */
+}
+
+.login-container {
+    backdrop-filter: blur(10px);
+    width: 350px;
+    height: auto; /* Set to auto to adjust based on content */
+    min-height: 400px; /* Minimum height for the container */
+    color: white;
+    max-width: 90%; /* Change to 90% to make it responsive */
+    margin: 0 auto;
+    padding: 2em; /* Increase padding for better spacing */
+    border-radius: 10px; /* Round the corners a bit more */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Add a shadow for depth */
+    background-color: rgba(0, 0, 0, 0.5); /* Dark background with transparency .........*/
+    
+}
+
+.login-heading {
+    text-align: center;
+    margin-bottom: 1em;
+    font-size: 2em;
+}
+
+.login-form-group {
+    margin-bottom: 2em;
+}
+
+.login-form-input {
+    width: 95%;
+    padding: 0.75em; /* Increased padding for a larger touch area */
+    border: 2px solid white; /* Blue border to match the theme */
+    border-radius: 8px; /* Rounded corners */
+    background-color: rgba(255, 255, 255, 0.1); /* Light background for contrast */
+    color: white; /* Text color */
+    font-size: 1em; /* Font size */
+    transition: border-color 0.3s ease, background-color 0.3s ease; /* Smooth transitions */
+}
+
+    .login-form-input:focus {
+        border-color: #00bfff; /* Lighter blue on focus */
+        background-color: rgba(255, 255, 255, 0.2); /* Darker background on focus */
+        outline: none; /* Remove default outline */
+        box-shadow: 0 0 5px rgba(0, 191, 255, 0.5); /* Subtle glow effect */
+    }
+
+.remember-me-label {
+    margin-left: 0.5em; /* Space between checkbox and label */
+}
+
+.login-error-message {
+    color: red;
+}
+
+.login-button {
+    display: block; /* Make the button a block element */
+    margin: 0 auto; /* Center the button */
+    width: 80%;
+    padding: 0.75em;
+    background: white;
+    color: blue;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background 0.3s; /* Smooth transition on hover */
+}
+
+    .login-button:hover {
+        background: #0056b3; /* Darker shade on hover */
+        color: white;
+    }
+
+.login-footer {
+    text-align: center; /* Center the footer links */
+    margin-top: 1em; /* Space above the footer */
+}
+
+.register-container {
+    text-align: center; /* Center the text */
+    margin-top: 1em; /* Add space above the register section */
+    width: 100%; /* Ensure the width is 100% of the parent */
+}
+
+.forgot-password-link,
+.create-account-link {
+    color: #007bff; /* Match link color to button */
+    text-decoration: none; /* Remove underline from links */
+}
+
+.forgot-password-link:hover,
+.create-account-link:hover {
+    text-decoration: underline; /* Underline on hover for better UX */
+}
+
+.remember-forgot-container {
+    display: flex; /* Use flexbox to align children */
+    justify-content: space-between; /* Space between items */
+    align-items: center; /* Center items vertically */
+    margin-bottom: 1em; /* Add some space below the group */
+}
+
+.remember-me-container {
+    display: flex; /* Optional: You can keep this as a flexbox if you want further styling */
+}
+
+.forgot-password-container {
+    text-align: right; /* Right-align the forgot password link */
+}
