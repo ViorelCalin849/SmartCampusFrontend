@@ -1,10 +1,11 @@
 .register-container {
     backdrop-filter: blur(5px); /* Maintain blur effect */
-    width: 350px;
-    height: auto;
+    width: 100% !important;
+    height: 95%;
+    max-height: 100%;
     color: white;
     max-width: 800px;
-    margin: 0 auto;
+    margin: 0 auto !important;
     padding: 2em;
     border-radius: 5px;
     background-color: rgba(0, 0, 0, 0.6);

@@ -1,36 +1,37 @@
+// src/components/Login.js
 import React, { useState } from 'react';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore'; // Import Firestore methods
+import { db } from '../firebase'; // Import Firestore db instance
 import '../styles/Login.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
         const auth = getAuth();
 
         try {
+            // Sign in with Firebase
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const token = await userCredential.user.getIdToken();
+            const user = userCredential.user;
 
-            const response = await fetch('https://localhost:7218/api/Auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ token }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Login failed');
+            // Fetch user data from Firestore
+            const userDoc = await getDoc(doc(db, 'users', user.uid)); // Fetch user document using user ID
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                localStorage.setItem('username', userData.username); // Store username in localStorage
+            } else {
+                console.log('No such user document!');
             }
 
-            const data = await response.json();
-            alert('Login successful. User ID: ' + data.userId);
-            setError('');
+            navigate('/dashboard'); // Redirect to dashboard on successful login
+
         } catch (error) {
             setError('An error occurred during login: ' + error.message);
         }
@@ -61,7 +62,6 @@ const Login = () => {
                     />
                 </div>
 
-                {/* Flexbox container for Remember Me and Forgot Password */}
                 <div className="remember-forgot-container">
                     <div className="remember-me-container">
                         <label>

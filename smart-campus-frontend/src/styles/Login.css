@@ -6,6 +6,7 @@ body, html {
     justify-content: center;
     align-items: center;
     min-height: 100vh; /* Ensure it occupies the full viewport height */
+    min-width: 100vw; /* Ensure it occupies the full viewport width */
     background-image: url('../../public/loginBackground.jpg');
     background-size: cover; /* Make the background image cover the whole page */
     background-position: center; /* Center the image */
@@ -16,10 +17,11 @@ body, html {
 .login-container {
     backdrop-filter: blur(10px);
     width: 350px;
-    height: auto; /* Set to auto to adjust based on content */
+    height: 95%; /* Set to auto to adjust based on content */
+    max-height: 100%; /* Ensure the container doesn't exceed the viewport height */
     min-height: 400px; /* Minimum height for the container */
     color: white;
-    max-width: 90%; /* Change to 90% to make it responsive */
+    max-width: 100%; /* Change to 90% to make it responsive */
     margin: 0 auto;
     padding: 2em; /* Increase padding for better spacing */
     border-radius: 10px; /* Round the corners a bit more */

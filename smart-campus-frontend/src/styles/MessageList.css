@@ -1,0 +1,40 @@
+/* src/styles/MessageList.css */
+.message-list {
+    flex: 1;
+    overflow-y: auto; /* Allows vertical scrolling */
+    padding: 20px;
+    background-color: #36393f; /* Background color of message list */
+    color: #ffffff; /* Text color */
+}
+
+.message {
+    display: flex; /* Flexbox for alignment */
+    align-items: flex-start; /* Align items to the top */
+    padding: 8px 0; /* Vertical padding for each message */
+    max-width: 80%; /* Limit max width of each message */
+    word-wrap: break-word; /* Allow long words to break */
+    overflow-wrap: break-word; /* CSS3 property for word breaking */
+    white-space: pre-wrap; /* Preserve whitespace and wrap long lines */
+    overflow: hidden; /* Hide overflow content */
+}
+
+.message.staff .message-user {
+    color: #7289da; /* Color for staff messages */
+}
+
+.message.student .message-user {
+    color: #43b581; /* Color for student messages */
+}
+
+.message-user {
+    font-weight: bold; /* Bold text for user type */
+    margin-right: 10px; /* Space after user type */
+}
+
+.message-text {
+    font-size: 15px; /* Font size for message text */
+    color: #dcddde; /* Text color for message */
+    overflow-wrap: break-word; /* Prevent overflow */
+    word-break: break-word; /* Break words if needed */
+    white-space: pre-wrap; /* Preserve whitespace and wrap long lines */
+}
