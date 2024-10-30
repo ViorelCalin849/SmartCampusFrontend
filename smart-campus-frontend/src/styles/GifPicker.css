@@ -1,0 +1,21 @@
+/* src/styles/GifPicker.css */
+.gif-picker {
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: white;
+    position: absolute;
+    bottom: 60px;
+}
+
+.gif-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.gif-grid img {
+    width: 100px;
+    height: 100px;
+    cursor: pointer;
+}

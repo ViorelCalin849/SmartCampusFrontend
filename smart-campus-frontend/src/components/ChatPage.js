@@ -1,9 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { db } from '../firebase'; // Import your Firestore configuration
-import { collection, doc, getDoc, addDoc, onSnapshot, query, orderBy } from 'firebase/firestore';
-import ChatInput from './ChatInput'; // Import your ChatInput component
-import MessageList from './MessageList'; // Import your MessageList component
-import '../styles/ChatPage.css'; // Import your CSS
+import {
+    collection,
+    doc,
+    getDoc,
+    addDoc,
+    onSnapshot,
+    query,
+    orderBy,
+    updateDoc
+} from 'firebase/firestore';
+import ChatInput from './ChatInput';
+import MessageList from './MessageList';
+import '../styles/ChatPage.css';
 
 const ChatPage = () => {
     const [messages, setMessages] = useState([]);
@@ -11,12 +20,25 @@ const ChatPage = () => {
     const [username, setUsername] = useState('');
     const [role, setRole] = useState('student'); // Default role
     const [errorMessage, setErrorMessage] = useState('');
+    const [onlineUsers, setOnlineUsers] = useState([]);
+    const [offlineUsers, setOfflineUsers] = useState([]); // New state for offline users
 
     useEffect(() => {
         const storedUserId = localStorage.getItem('userId');
-
+        
         if (storedUserId) {
-            fetchUserData(storedUserId); // Fetch user data using userId
+            fetchUserData(storedUserId);
+            updateOnlineStatus(storedUserId, 'online');
+
+            // Update user status to offline on component unmount or window close
+            const handleOfflineStatus = () => {
+                updateOnlineStatus(storedUserId, 'offline');
+            };
+            window.addEventListener('beforeunload', handleOfflineStatus);
+            return () => {
+                handleOfflineStatus();
+                window.removeEventListener('beforeunload', handleOfflineStatus);
+            };
         } else {
             console.error('User ID not found in local storage');
         }
@@ -30,7 +52,6 @@ const ChatPage = () => {
                 setUsername(userData.username);
                 setRole(userData.role);
                 setRoom(userData.role === 'admin' ? 'admin' : 'student'); // Set initial room based on role
-                //console.log('User Data:', userData); // Log user data for debugging
             } else {
                 console.error('User not found in Firestore');
             }
@@ -39,6 +60,36 @@ const ChatPage = () => {
         }
     };
 
+    const updateOnlineStatus = async (userId, status) => {
+        try {
+            await updateDoc(doc(db, 'users', userId), { status: status });
+        } catch (error) {
+            console.error("Error updating user status:", error);
+        }
+    };
+
+    // Fetch all users to separate into online and offline
+    useEffect(() => {
+        const usersQuery = collection(db, 'users');
+        
+        const unsubscribe = onSnapshot(usersQuery, (snapshot) => {
+            const usersData = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+            
+            setOnlineUsers(usersData.filter(user => user.status === 'online'));
+            setOfflineUsers(usersData.filter(user => user.status === 'offline'));
+        });
+        
+        return () => unsubscribe();
+    }, []);
+
+    // Filter online users into admins and students
+    const admins = onlineUsers.filter(user => user.role === 'admin');
+    const students = onlineUsers.filter(user => user.role === 'student');
+
+    // Fetch messages based on the current room
     useEffect(() => {
         const messagesQuery = query(
             collection(db, `messages_${room}`),
@@ -51,9 +102,8 @@ const ChatPage = () => {
                 ...doc.data(),
             }));
             setMessages(messagesData);
-            //console.log('Messages fetched:', messagesData); // Log fetched messages
         }, (error) => {
-            console.error('Error fetching messages:', error); // Handle errors
+            console.error('Error fetching messages:', error);
         });
 
         return () => unsubscribe();
@@ -66,22 +116,18 @@ const ChatPage = () => {
                 username: username,
                 timestamp: new Date(),
             });
-            //console.log('Message sent:', message); // Log sent message
         } catch (error) {
             console.error("Error adding document:", error);
         }
     };
 
     const handleToggleRoom = () => {
-        console.log('Current Role:', role); // Log current role before toggling
         if (role === 'admin') {
             const newRoom = room === 'student' ? 'admin' : 'student';
             setRoom(newRoom);
-            setErrorMessage(''); // Clear any error messages
-            //console.log('Room toggled to:', newRoom); // Log the toggled room
+            setErrorMessage('');
         } else {
             setErrorMessage('Access Denied: Only admins can access the admin room.');
-            //console.log('Access denied for room toggle. Current role:', role); // Log access denied attempt
         }
     };
 
@@ -89,12 +135,53 @@ const ChatPage = () => {
         <div className="chat-page">
             <div className="chat-sidebar">
                 <h2>{room.charAt(0).toUpperCase() + room.slice(1)} Chat Room</h2>
-                {role === 'admin' && ( // Only show toggle for admins
+                {role === 'admin' && (
                     <button onClick={handleToggleRoom} className="toggle-button">
                         Switch to {room === 'student' ? 'Admin' : 'Student'} Room
                     </button>
                 )}
                 {errorMessage && <p className="error-message">{errorMessage}</p>}
+                
+                <div className="user-list">
+                    <h3>Admins (Online)</h3>
+                    <ul className="online-users">
+                        {admins.length > 0 ? (
+                            admins.map((user) => (
+                                <li key={user.id} className="online-user">
+                                    {user.username}
+                                </li>
+                            ))
+                        ) : (
+                            <p>No admins online</p>
+                        )}
+                    </ul>
+
+                    <h3>Students (Online)</h3>
+                    <ul className="online-users">
+                        {students.length > 0 ? (
+                            students.map((user) => (
+                                <li key={user.id} className="online-user">
+                                    {user.username}
+                                </li>
+                            ))
+                        ) : (
+                            <p>No students online</p>
+                        )}
+                    </ul>
+
+                    <h3>Offline Users</h3>
+                    <ul className="offline-users">
+                        {offlineUsers.length > 0 ? (
+                            offlineUsers.map((user) => (
+                                <li key={user.id} className="offline-user">
+                                    {user.username} ({user.role})
+                                </li>
+                            ))
+                        ) : (
+                            <p>No offline users</p>
+                        )}
+                    </ul>
+                </div>
             </div>
             <div className="chat-main">
                 <MessageList messages={messages} />

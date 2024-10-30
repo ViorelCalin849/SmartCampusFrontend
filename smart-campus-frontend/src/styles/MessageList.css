@@ -38,3 +38,10 @@
     word-break: break-word; /* Break words if needed */
     white-space: pre-wrap; /* Preserve whitespace and wrap long lines */
 }
+
+.youtube-embed {
+    width: 100%; /* Full width for responsiveness */
+    max-width: 560px; /* Max width for larger screens */
+    height: auto; /* Maintain aspect ratio */
+    margin: 10px 0; /* Add margin for spacing */
+}
