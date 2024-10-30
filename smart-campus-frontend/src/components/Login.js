@@ -15,23 +15,26 @@ const Login = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         const auth = getAuth();
-
+    
         try {
             // Sign in with Firebase
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
-
+    
             // Fetch user data from Firestore
-            const userDoc = await getDoc(doc(db, 'users', user.uid)); // Fetch user document using user ID
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
             if (userDoc.exists()) {
                 const userData = userDoc.data();
-                localStorage.setItem('username', userData.username); // Store username in localStorage
+                localStorage.setItem('username', userData.username); // Store username
+                localStorage.setItem('role', userData.role); // Store user role
+                localStorage.setItem('userId', user.uid);
+                
             } else {
                 console.log('No such user document!');
             }
-
+    
             navigate('/dashboard'); // Redirect to dashboard on successful login
-
+    
         } catch (error) {
             setError('An error occurred during login: ' + error.message);
         }

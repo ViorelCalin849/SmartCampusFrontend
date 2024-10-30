@@ -14,7 +14,7 @@ const MessageList = ({ messages }) => {
         <div className="message-list">
             {messages.map((message) => (
                 <div key={message.id} className={`message ${message.userType}`}>
-                    <span className="message-user">{message.username} ({message.userType})</span> {/* Display username */}
+                    <span className="message-user">{message.username}</span> {/* Display username only */}
                     <span className="message-timestamp">
                         {new Date(message.timestamp.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>

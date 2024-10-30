@@ -35,6 +35,7 @@ const Register = () => {
             await setDoc(doc(db, "users", userId), {
                 email: email,
                 username: username,
+                role: "student" // Default role
             });
 
             console.log("User data saved to Firestore.");
