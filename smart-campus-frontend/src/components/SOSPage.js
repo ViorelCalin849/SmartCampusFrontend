@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
-import { collection, addDoc, getDocs, query, orderBy, limit, updateDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, orderBy, limit, updateDoc, doc, onSnapshot } from 'firebase/firestore';
 import { getDoc } from 'firebase/firestore';
 import '../styles/SOSPage.css';
 
@@ -10,11 +10,11 @@ const SOSPage = () => {
     const [location, setLocation] = useState('');
     const [recentReports, setRecentReports] = useState([]);
     const [isAdmin, setIsAdmin] = useState(false);
-    const [username, setUsername] = useState(''); // New state for username
+    const [username, setUsername] = useState('');
 
     useEffect(() => {
         fetchRecentReports();
-        checkUserRole(); // Check user role
+        checkUserRole();
     }, []);
 
     const checkUserRole = async () => {
@@ -24,7 +24,7 @@ const SOSPage = () => {
             if (userDoc.exists()) {
                 const userData = userDoc.data();
                 setIsAdmin(userData.role === 'admin');
-                setUsername(userData.username); // Assuming username is also stored in user document
+                setUsername(userData.username);
             }
         }
     };
@@ -35,12 +35,9 @@ const SOSPage = () => {
             return;
         }
 
-        // Confirmation dialog
-        const userConfirmed = window.confirm(`Are you certain you wish to make this report, ${username}? If it is found to be a false report, you will be held liable for wasted resources and inciting panic.`);
-        
-        if (!userConfirmed) {
-            return; // Exit if user cancels
-        }
+        const userConfirmed = window.confirm(`Are you certain you wish to make this report, ${username}?`);
+
+        if (!userConfirmed) return;
 
         const reportData = {
             type: incidentType,
@@ -48,12 +45,14 @@ const SOSPage = () => {
             location: location,
             timestamp: new Date(),
             status: 'Pending',
-            reporter: username, // Store the username of the reporter
+            reporter: username,
         };
 
         try {
             await addDoc(collection(db, 'incidentReports'), reportData);
             alert('Incident report sent successfully!');
+            await sendAlertMessages();
+
             setIncidentType('');
             setDescription('');
             setLocation('');
@@ -63,6 +62,35 @@ const SOSPage = () => {
             alert('Failed to send report. Please try again.');
         }
     };
+
+    const sendAlertMessages = async () => {
+        const alertMessage = {
+            text: `ALERT: ${incidentType} - ${description} at ${location || 'unspecified location'}`,
+            username: 'System Alert',
+            timestamp: new Date(),
+        };
+    
+        const videoMessage = {
+            text: 'https://www.youtube.com/watch?v=qf8GGfWZw5Q', // YouTube video URL
+            username: 'System Alert',
+            timestamp: new Date(),
+        };
+    
+        const chatRooms = ['messages_student', 'messages_admin'];
+    
+        try {
+            for (const room of chatRooms) {
+                // Send the SOS alert message 5 times
+                for (let i = 0; i < 5; i++) {
+                    await addDoc(collection(db, room), alertMessage);
+                }
+                // Send the video message only once
+                await addDoc(collection(db, room), videoMessage);
+            }
+        } catch (error) {
+            console.error('Error sending alert messages:', error);
+        }
+    };    
 
     const fetchRecentReports = async () => {
         try {

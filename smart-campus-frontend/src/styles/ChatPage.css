@@ -149,31 +149,54 @@
 
 .user-list {
     margin-top: 20px;
+    padding: 10px;
+    border-radius: 10px; /* Rounded corners for the user list */
+    background-color: rgba(255, 255, 255, 0.1); /* Slightly lighter background */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
 }
 
+/* Headings for user lists */
 .user-list h3 {
-    margin-bottom: 5px;
-    color: #333;
-    font-size: 1.1em;
+    margin-bottom: 10px;
+    color: #fff; /* Bright color for better visibility */
+    font-size: 1.2em; /* Slightly larger font size */
+    text-align: center; /* Center align headings */
 }
 
+/* Style for the lists themselves */
 .online-users,
 .offline-users {
     list-style: none;
     padding: 0;
-    margin: 0 0 10px;
+    margin: 0;
+    display: flex; /* Use flexbox for layout */
+    flex-direction: column; /* Stack items vertically */
 }
 
+/* Style for individual users */
+.online-user,
+.offline-user {
+    padding: 8px 12px; /* Add padding for better touch targets */
+    margin-bottom: 5px; /* Space between users */
+    border-radius: 5px; /* Rounded corners for users */
+    transition: background-color 0.2s; /* Smooth background transition */
+}
+
+/* Specific styles for online and offline users */
 .online-user {
-    padding: 5px;
-    font-weight: bold;
-    color: green;
+    background-color: rgba(0, 255, 0, 0.2); /* Light green background */
+    color: #fff; /* White text for contrast */
 }
 
 .offline-user {
-    padding: 5px;
-    color: #888; /* Gray color for offline users */
-    font-style: italic;
+    background-color: rgba(255, 0, 0, 0.2); /* Light red background */
+    color: #ddd; /* Slightly lighter gray for offline users */
+}
+
+/* Hover effect */
+.online-user:hover,
+.offline-user:hover {
+    background-color: rgba(255, 255, 255, 0.2); /* Slightly highlight on hover */
 }
 
 /* src/styles/ChatPage.css */
@@ -183,4 +206,57 @@
     border-radius: 8px; /* Optional styling */
     margin-top: 5px; /* Space above the GIF */
     margin-bottom: 5px; /* Space below the GIF */
+}
+
+.admin-message {
+    background-color: #e0f7fa; /* Light blue background */
+    color: #00796b; /* Darker teal for text */
+    border-left: 4px solid #00796b; /* Adds a left border for emphasis */
+}
+
+.sos-alert {
+    background-color: #ffcccc; /* Light red background for SOS messages */
+    color: #c70000; /* Dark red text for SOS messages */
+    font-weight: bold; /* Bold text for emphasis */
+    border: 1px solid #c70000; /* Optional: Add a border for further emphasis */
+    animation: pulse 2s infinite; /* Optional: Add animation for SOS messages */
+}
+
+@keyframes pulse {
+    0% {
+        background-color: #ffcccc;
+    }
+    50% {
+        background-color: #ff9999;
+    }
+    100% {
+        background-color: #ffcccc;
+    }
+}
+
+.sos-alert-content {
+    padding: 10px; /* Add padding around the alert content */
+    border: 1px solid #c70000; /* Border to emphasize SOS alert */
+    border-radius: 5px; /* Rounded corners for the alert box */
+    background-color: #ffe6e6; /* Slightly different background color for alert */
+}
+
+.toggle-button {
+    background-color: #007bff; /* Bootstrap primary color */
+    color: white; /* Text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 20px; /* Vertical and horizontal padding */
+    font-size: 16px; /* Font size */
+    cursor: pointer; /* Cursor changes to pointer on hover */
+    transition: background-color 0.3s ease; /* Smooth transition for background color */
+    margin-top: 10px; /* Spacing from the element above */
+}
+
+.toggle-button:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+}
+
+.toggle-button:focus {
+    outline: none; /* Remove outline on focus */
 }
