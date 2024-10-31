@@ -1,7 +1,6 @@
-// src/components/Login.js
 import React, { useState } from 'react';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore'; // Import Firestore methods
+import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, GithubAuthProvider } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase'; // Import Firestore db instance
 import '../styles/Login.css';
 import { Link, useNavigate } from 'react-router-dom';
@@ -17,54 +16,82 @@ const Login = () => {
         const auth = getAuth();
     
         try {
-            // Sign in with Firebase
+            // Sign in with Email/Password
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-    
-            // Fetch user data from Firestore
-            const userDoc = await getDoc(doc(db, 'users', user.uid));
-            if (userDoc.exists()) {
-                const userData = userDoc.data();
-                localStorage.setItem('username', userData.username); // Store username
-                localStorage.setItem('role', userData.role); // Store user role
-                localStorage.setItem('userId', user.uid);
-                
-            } else {
-                console.log('No such user document!');
-            }
-    
-            navigate('/dashboard'); // Redirect to dashboard on successful login
-    
+            await handleUserData(userCredential.user);
+            localStorage.setItem('userId', userCredential.user.uid); // Store userId in local storage
+            navigate('/dashboard');
         } catch (error) {
             setError('An error occurred during login: ' + error.message);
         }
     };
 
+    const handleGoogleSignIn = async () => {
+        const auth = getAuth();
+        const provider = new GoogleAuthProvider();
+        try {
+            const result = await signInWithPopup(auth, provider);
+            await handleUserData(result.user);
+            localStorage.setItem('userId', result.user.uid); // Store userId in local storage
+            navigate('/dashboard');
+        } catch (error) {
+            setError('An error occurred during Google sign-in: ' + error.message);
+        }
+    };
+
+    const handleGithubSignIn = async () => {
+        const auth = getAuth();
+        const provider = new GithubAuthProvider();
+        try {
+            const result = await signInWithPopup(auth, provider);
+            await handleUserData(result.user);
+            localStorage.setItem('userId', result.user.uid); // Store userId in local storage
+            navigate('/dashboard');
+        } catch (error) {
+            setError('An error occurred during GitHub sign-in: ' + error.message);
+        }
+    };
+
+    const handleUserData = async (user) => {
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
+        
+        if (!userDoc.exists()) {
+            // Create a new user document in Firestore
+            const userData = {
+                email: user.email,
+                username: user.displayName || user.email.split('@')[0], // Use display name or email prefix
+                role: 'student', // Default role
+                status: 'online', // Set status as online
+            };
+            await setDoc(userDocRef, userData);
+        } else {
+            await setDoc(userDocRef, { status: 'online' }, { merge: true });
+        }
+    };
+
     return (
         <div className="login-container">
-            <h2 className="login-heading">Login</h2>
+            <h1>Login</h1>
+            {error && <p className="error">{error}</p>}
             <form onSubmit={handleLogin}>
-                <div className="login-form-group">
-                    <input
-                        type="email"
-                        placeholder="Email / Username"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="login-form-input"
-                        required
-                    />
-                </div>
-                <div className="login-form-group">
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="login-form-input"
-                        required
-                    />
-                </div>
-
+                <input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="login-form-input" // Add your custom class if needed
+                />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="login-form-input" // Add your custom class if needed
+                />
+                
                 <div className="remember-forgot-container">
                     <div className="remember-me-container">
                         <label>
@@ -79,12 +106,24 @@ const Login = () => {
                         <Link to="/forgot-password" className="forgot-password-link">Forgot Password?</Link>
                     </div>
                 </div>
-
-                {error && <p className="login-error-message">{error}</p>}
+    
                 <button type="submit" className="login-button">Login</button>
             </form>
+            
+            <p>or</p>
+            
+            {/* Flex container for Google and GitHub buttons */}
+            <div className="oauth-buttons-container">
+                <button className="oauth-button google" onClick={handleGoogleSignIn}>
+                    Login with Google
+                </button>
+                <button className="oauth-button github" onClick={handleGithubSignIn}>
+                    Login with GitHub
+                </button>
+            </div>
+    
             <p>
-                Do you have an account? <Link to="/register" className="create-account-link">Register</Link>
+                Don't have an account? <Link to="/register" className="forgot-password-link">Register here</Link>
             </p>
         </div>
     );

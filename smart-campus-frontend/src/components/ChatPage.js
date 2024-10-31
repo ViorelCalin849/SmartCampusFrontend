@@ -21,11 +21,11 @@ const ChatPage = () => {
     const [role, setRole] = useState('student'); // Default role
     const [errorMessage, setErrorMessage] = useState('');
     const [onlineUsers, setOnlineUsers] = useState([]);
-    const [offlineUsers, setOfflineUsers] = useState([]); // New state for offline users
+    const [offlineUsers, setOfflineUsers] = useState([]);
 
     useEffect(() => {
         const storedUserId = localStorage.getItem('userId');
-        
+
         if (storedUserId) {
             fetchUserData(storedUserId);
             updateOnlineStatus(storedUserId, 'online');
@@ -52,6 +52,8 @@ const ChatPage = () => {
                 setUsername(userData.username);
                 setRole(userData.role);
                 setRoom(userData.role === 'admin' ? 'admin' : 'student'); // Set initial room based on role
+                // Ensure to set online status when user logs in
+                updateOnlineStatus(userId, 'online');
             } else {
                 console.error('User not found in Firestore');
             }
@@ -71,17 +73,17 @@ const ChatPage = () => {
     // Fetch all users to separate into online and offline
     useEffect(() => {
         const usersQuery = collection(db, 'users');
-        
+
         const unsubscribe = onSnapshot(usersQuery, (snapshot) => {
             const usersData = snapshot.docs.map((doc) => ({
                 id: doc.id,
                 ...doc.data(),
             }));
-            
+
             setOnlineUsers(usersData.filter(user => user.status === 'online'));
             setOfflineUsers(usersData.filter(user => user.status === 'offline'));
         });
-        
+
         return () => unsubscribe();
     }, []);
 
@@ -141,7 +143,7 @@ const ChatPage = () => {
                     </button>
                 )}
                 {errorMessage && <p className="error-message">{errorMessage}</p>}
-                
+
                 <div className="user-list">
                     <h3>Admins (Online)</h3>
                     <ul className="online-users">
