@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
-import { collection, addDoc, getDocs, query, orderBy, limit, updateDoc, doc, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, orderBy, limit, updateDoc, doc } from 'firebase/firestore';
 import { getDoc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import '../styles/SOSPage.css';
 
 const SOSPage = () => {
@@ -11,6 +12,28 @@ const SOSPage = () => {
     const [recentReports, setRecentReports] = useState([]);
     const [isAdmin, setIsAdmin] = useState(false);
     const [username, setUsername] = useState('');
+    const [backendUp, setBackendUp] = useState(false); // Track backend status
+
+    const navigate = useNavigate(); // Get navigate function
+
+    // Check if backend server is running
+    useEffect(() => {
+        const checkBackendStatus = async () => {
+            try {
+                const response = await fetch('https://localhost:7218/api/auth/status');
+                if (response.ok) {
+                    setBackendUp(true); // Set backend status to true if reachable
+                } else {
+                    setBackendUp(false);
+                }
+            } catch (error) {
+                console.error("Backend check failed:", error);
+                setBackendUp(false);
+            }
+        };
+
+        checkBackendStatus();
+    }, []);
 
     useEffect(() => {
         fetchRecentReports();
@@ -119,9 +142,20 @@ const SOSPage = () => {
         }
     };
 
+    if (!backendUp) {
+        return (
+            <div className="BackEnd-Down">
+                <p className="error">Backend server is currently down. Please try again later.</p>
+            </div>
+        );
+    }
+
     return (
         <div className="sos-container">
             <h1 className="sos-title">Report Campus Incident</h1>
+            <button className="back-to-dashboard-button" onClick={() => navigate('/dashboard')}>
+                Back to Dashboard
+            </button>
             <div className="sos-form">
                 <select
                     className="sos-incident-type"

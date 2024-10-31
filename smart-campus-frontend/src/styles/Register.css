@@ -1,5 +1,5 @@
 .register-container {
-    backdrop-filter: blur(5px); /* Maintain blur effect */
+    backdrop-filter: blur(5px);
     width: 100% !important;
     height: 95%;
     max-height: 100%;
@@ -49,8 +49,8 @@
 }
 
 .register-button {
-    display: block; /* Make the button a block element */
-    margin: 0 auto; /* Center the button */
+    display: block; 
+    margin: 0 auto; 
     width: 80%;
     padding: 0.75em;
     background: white;
@@ -59,7 +59,7 @@
     border-radius: 50px;
     cursor: pointer;
     font-size: 1em;
-    transition: background 0.3s; /* Smooth transition on hover */
+    transition: background 0.3s; 
 }
 
 .register-button:hover {
@@ -75,6 +75,8 @@
 .login-link {
     color: #007bff;
     text-decoration: none;
+    width: auto;
+    height: 0;
 }
 
     .login-link:hover {

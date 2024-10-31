@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, GithubAuthProvider } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase'; // Import Firestore db instance
@@ -9,7 +9,23 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [backendUp, setBackendUp] = useState(false); // Track backend status
     const navigate = useNavigate();
+
+    // Check if backend server is running
+    useEffect(() => {
+        const checkBackendStatus = async () => {
+            try {
+                const response = await fetch('https://localhost:7218/api/auth/status');
+                setBackendUp(response.ok);
+            } catch (error) {
+                console.error("Backend check failed:", error);
+                setBackendUp(false);
+            }
+        };
+
+        checkBackendStatus();
+    }, []);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -70,6 +86,14 @@ const Login = () => {
         }
     };
 
+    if (!backendUp) {
+        return (
+            <div className="BackEnd-Down">
+                <p className="error">Backend server is currently down. Please try again later.</p>
+            </div>
+        );
+    }
+
     return (
         <div className="login-container">
             <h1>Login</h1>
@@ -81,7 +105,7 @@ const Login = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="login-form-input" // Add your custom class if needed
+                    className="login-form-input"
                 />
                 <input
                     type="password"
@@ -89,7 +113,7 @@ const Login = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="login-form-input" // Add your custom class if needed
+                    className="login-form-input"
                 />
                 
                 <div className="remember-forgot-container">
@@ -112,7 +136,6 @@ const Login = () => {
             
             <p>or</p>
             
-            {/* Flex container for Google and GitHub buttons */}
             <div className="oauth-buttons-container">
                 <button className="oauth-button google" onClick={handleGoogleSignIn}>
                     Login with Google

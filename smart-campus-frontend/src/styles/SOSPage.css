@@ -122,3 +122,19 @@
     flex: 1; /* Allow report details to take up the available space */
     margin-right: 10px; /* Space between the report details and button */
 }
+
+.back-to-dashboard-button {
+    background-color: red; /* Blue background */
+    color: white;              /* White text */
+    border: none;              /* Remove default border */
+    border-radius: 5px;       /* Rounded corners */
+    padding: 10px 20px;       /* Top/bottom and left/right padding */
+    font-size: 16px;          /* Font size */
+    cursor: pointer;          /* Pointer cursor on hover */
+    transition: background-color 0.3s ease; /* Smooth transition */
+    margin-bottom: 20px;      /* Space below the button */
+}
+
+.back-to-dashboard-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}

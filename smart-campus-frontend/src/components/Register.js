@@ -1,8 +1,6 @@
-import React, { useState } from 'react';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
-import { Link, useNavigate } from 'react-router-dom';
-import '../styles/Register.css';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom'; // Import Link and useNavigate for navigation
+import '../styles/Register.css'; // Import your CSS file
 
 const Register = () => {
     const [username, setUsername] = useState('');
@@ -10,96 +8,148 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState(null);
-    const navigate = useNavigate();
+    const [success, setSuccess] = useState('');
+    const [backendUp, setBackendUp] = useState(false); // Track backend status
 
-    const handleRegister = async (e) => {
-        e.preventDefault();
-        setError(null); // Reset any existing errors
+    // Check if backend server is running
+    useEffect(() => {
+        const checkBackendStatus = async () => {
+            try {
+                const response = await fetch('https://localhost:7218/api/auth/status');
+                if (response.ok) {
+                    setBackendUp(true); // Set backend status to true if reachable
+                } else {
+                    setBackendUp(false);
+                }
+            } catch (error) {
+                console.error("Backend check failed:", error);
+                setBackendUp(false);
+            }
+        };
 
-        if (password !== confirmPassword) {
-            setError("Passwords do not match");
-            return;
+        checkBackendStatus();
+    }, []);
+
+    const navigate = useNavigate(); // Initialize the navigate function
+
+    const validateInput = () => {
+        if (!username || !email || !password || !confirmPassword) {
+            setError('All fields are required.');
+            return false;
         }
+        if (password.length < 6) {
+            setError('Password must be at least 6 characters long.');
+            return false;
+        }
+        if (password !== confirmPassword) {
+            setError('Passwords do not match.');
+            return false;
+        }
+        if (!email.includes('@') || !email.includes('.')) {
+            setError('Invalid email format.');
+            return false;
+        }
+        setError(null); // Reset error if validation passes
+        return true;
+    };
 
-        const auth = getAuth();
-        const db = getFirestore(); // Initialize Firestore
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!validateInput()) return; // Ensure validation is checked
+
+        const userData = {
+            email: email,
+            password: password,
+            username: username,
+        };
 
         try {
-            // Step 1: Register the user with Firebase Authentication
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const userId = userCredential.user.uid; // Get the user's UID
-
-            console.log("Registered with Firebase Auth. UserID:", userId);
-
-            // Step 2: Save the username and email to Firestore directly
-            await setDoc(doc(db, "users", userId), {
-                email: email,
-                username: username,
-                role: "student" // Default role
+            const response = await fetch("https://localhost:7218/api/auth/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(userData),
             });
 
-            console.log("User data saved to Firestore.");
+            if (!response.ok) {
+                const errorResponse = await response.json();
+                throw new Error(errorResponse.message || "Something went wrong!");
+            }
 
-            alert("Registration successful. Redirecting to login.");
-            navigate('/'); // Redirect to login page or home
+            const data = await response.json();
+            setSuccess("Registration successful!");
+            setUsername('');
+            setEmail('');
+            setPassword('');
+            setConfirmPassword('');
+
+            console.log("Registration successful:", data);
+            navigate('/'); // Redirect to the login page (or home page) after successful registration
         } catch (error) {
-            setError("An error occurred during registration: " + error.message);
-            console.error("Error during registration:", error);
+            console.error("Error during registration:", error.message);
+            setError(error.message);
         }
     };
+
+    if (!backendUp) {
+        return (
+            <div className="BackEnd-Down">
+                <p className="error">Backend server is currently down. Please try again later.</p>
+            </div>
+        );
+    }
 
     return (
         <div className="register-container">
             <h2 className="register-heading">Register</h2>
-            <form onSubmit={handleRegister}>
+            {error && <p className="register-error-message">{error}</p>}
+            {success && <p style={{ color: 'green' }}>{success}</p>}
+            <form onSubmit={handleSubmit}>
                 <div className="register-form-group">
                     <input
                         type="text"
+                        className="register-form-input"
                         placeholder="Username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        className="register-form-input"
                         required
                     />
                 </div>
                 <div className="register-form-group">
                     <input
                         type="email"
+                        className="register-form-input"
                         placeholder="Email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="register-form-input"
                         required
                     />
                 </div>
                 <div className="register-form-group">
                     <input
                         type="password"
+                        className="register-form-input"
                         placeholder="Password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="register-form-input"
                         required
                     />
                 </div>
                 <div className="register-form-group">
                     <input
                         type="password"
+                        className="register-form-input"
                         placeholder="Confirm Password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="register-form-input"
                         required
                     />
                 </div>
-
-                {error && <p className="register-error-message">{error}</p>}
-
                 <button type="submit" className="register-button">Register</button>
             </form>
-            <p>
-                Already have an account? <Link to="/" className="login-link">Login</Link>
-            </p>
+            <p>Already have an account? <Link to="/" className="login-link">Login here</Link></p>
         </div>
     );
 };

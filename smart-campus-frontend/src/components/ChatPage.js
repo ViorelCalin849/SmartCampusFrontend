@@ -23,6 +23,26 @@ const ChatPage = () => {
     const [onlineUsers, setOnlineUsers] = useState([]);
     const [offlineUsers, setOfflineUsers] = useState([]);
     const messagesEndRef = useRef(null);
+    const [backendUp, setBackendUp] = useState(false); // Track backend status
+
+    // Check if backend server is running
+    useEffect(() => {
+        const checkBackendStatus = async () => {
+            try {
+                const response = await fetch('https://localhost:7218/api/auth/status');
+                if (response.ok) {
+                    setBackendUp(true); // Set backend status to true if reachable
+                } else {
+                    setBackendUp(false);
+                }
+            } catch (error) {
+                console.error("Backend check failed:", error);
+                setBackendUp(false);
+            }
+        };
+
+        checkBackendStatus();
+    }, []);
 
     useEffect(() => {
         const storedUserId = localStorage.getItem('userId');
@@ -133,6 +153,14 @@ const ChatPage = () => {
             setErrorMessage('Access Denied: Only admins can access the admin room.');
         }
     };
+
+    if (!backendUp) {
+        return (
+            <div className="BackEnd-Down">
+                <p className="error">Backend server is currently down. Please try again later.</p>
+            </div>
+        );
+    }
 
     return (
         <div className="chat-page">
