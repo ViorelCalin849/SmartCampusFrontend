@@ -5,43 +5,51 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 50vh; /* Full viewport height */
-    width: 60vh;
-    background-color: #f7f7f7; /* Light background color */
-    color: #333; /* Dark text color */
-    font-family: 'Arial', sans-serif;
+    max-width: 500px;
+    margin: 0 auto;
     padding: 20px;
-    border-radius: 20px;
+    background-color: #f7f7f7;
+    color: #333;
+    font-family: 'Arial', sans-serif;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .sos-title {
-    font-size: 2rem;
+    font-size: 1.8rem;
     margin-bottom: 20px;
-    color: #ff0000; /* Red color for SOS */
+    color: #ff0000;
+    text-align: center;
 }
 
-.sos-message-input {
+.sos-form {
     width: 100%;
-    height: 100px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    resize: none; /* Prevent resizing */
+    margin-bottom: 20px;
 }
 
+.sos-incident-type, 
+.sos-description-input, 
 .sos-location-input {
     width: 100%;
     padding: 10px;
+    margin-bottom: 15px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    margin-bottom: 20px;
+    font-size: 1rem;
+}
+
+.sos-description-input {
+    height: 100px;
+    resize: none;
 }
 
 .sos-send-button {
-    padding: 10px 20px;
-    background-color: #ff0000; /* Red color for SOS button */
-    color: white;
+    width: 100%;
+    padding: 12px;
+    background-color: #ff0000;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: bold;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -49,5 +57,68 @@
 }
 
 .sos-send-button:hover {
+    background-color: #cc0000;
+}
+
+.sos-recent-reports {
+    width: 100%;
+}
+
+.sos-recent-reports h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #333;
+    text-align: center;
+}
+
+.sos-recent-reports ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sos-recent-reports li {
+    background-color: #fff;
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
+.sos-recent-reports li strong {
+    color: #ff0000;
+}
+
+.sos-recent-reports li span {
+    display: block;
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.dismiss-button {
+    margin-top: 5px;
+    padding: 5px 10px;
+    background-color: #ff4444; /* Bright red to make it visible */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 0.9rem;
+}
+
+.dismiss-button:hover {
     background-color: #cc0000; /* Darker red on hover */
+}
+
+.report-item {
+    display: flex;
+    justify-content: space-between; /* Distribute space between the report details and the button */
+    align-items: center; /* Align items vertically centered */
+}
+
+.report-details {
+    flex: 1; /* Allow report details to take up the available space */
+    margin-right: 10px; /* Space between the report details and button */
 }
