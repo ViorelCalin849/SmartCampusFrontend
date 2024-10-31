@@ -1,20 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase';
-import {
-    collection,
-    doc,
-    getDoc,
-    addDoc,
-    onSnapshot,
-    query,
-    orderBy,
-    updateDoc
-} from 'firebase/firestore';
+import {collection, doc, getDoc, addDoc, onSnapshot, query, orderBy, updateDoc} from 'firebase/firestore';
 import ChatInput from './ChatInput';
 import MessageList from './MessageList';
 import '../styles/ChatPage.css';
 
 const ChatPage = () => {
+    const navigate = useNavigate();
     const [messages, setMessages] = useState([]);
     const [room, setRoom] = useState('student');
     const [username, setUsername] = useState('');
@@ -166,6 +159,9 @@ const ChatPage = () => {
         <div className="chat-page">
             <div className="chat-sidebar">
                 <h2>{room.charAt(0).toUpperCase() + room.slice(1)} Chat Room</h2>
+                <button className="back-to-dashboard-button" onClick={() => navigate('/dashboard')}>
+                    Back to Dashboard
+                </button>
                 {role === 'admin' && (
                     <button onClick={handleToggleRoom} className="toggle-button">
                         Switch to {room === 'student' ? 'Admin' : 'Student'} Room
